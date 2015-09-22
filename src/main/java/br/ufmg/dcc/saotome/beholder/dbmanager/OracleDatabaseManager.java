@@ -280,7 +280,6 @@ public class OracleDatabaseManager {
 
 	/**
 	 * Limpa o banco de dados e carrega os dados contidos no XML da tabela.
-	 * @param schema Nome do esquema do Banco de Dados
 	 * @param tableName Nome da tabela do banco de Dados a ser carregado 
 	 */
 	public void resetTableAndDependecies(String tableName) {
