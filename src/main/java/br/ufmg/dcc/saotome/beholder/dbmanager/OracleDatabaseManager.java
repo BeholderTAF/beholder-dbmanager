@@ -1,4 +1,4 @@
-package br.ufmg.dcc.saotome.beholder_dbmanager;
+package br.ufmg.dcc.saotome.beholder.dbmanager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -217,18 +217,15 @@ public class OracleDatabaseManager {
 		createPathIfNotExists();
 		
 		try {
-			PrintWriter fullDB = new PrintWriter(filePath(FULL_DB,ExtensionFile.ORD), "UTF-8");
 			for (String string : connection.createDataSet().getTableNames()) {
 				String tableName = getTableName(string);
 				if ((string.contains(this.schema) && !this.skipedTables.contains(tableName))) {
 					PrintWriter writer = new PrintWriter(filePath(tableName,ExtensionFile.ORD), "UTF-8");
-					fullDB.println(tableName);
 					writeDependencies(connection, writer, tableName);
 					LOG.info(String.format("Ordem de carregamento da tabela %s exportada",string));
 					writer.close();
 				}
 			}
-			fullDB.close();
 		} catch (SQLException e) {
 			LOG.error(e.getMessage());
 			System.exit(1);
@@ -246,11 +243,20 @@ public class OracleDatabaseManager {
 				+ Calendar.getInstance().getTime());
 	}
 
+	/**
+	 * Método recursivo que verifica as dependencias que as tabelas possuem entre si baseados em suas
+	 * constraints.
+	 * @param connection Conexão do DBUnit
+	 * @param writer	Objeto onde está sendo escrita as dependências
+	 * @param table		Tabela onde será buscada as dependências
+	 * @throws DataSetException
+	 * @throws SQLException
+	 */
 	private void writeDependencies(final IDatabaseConnection connection, final PrintWriter writer, final String table)
 			throws DataSetException, SQLException {
 
 		String query = String.format(
-				  "select TABLE_NAME "
+				  "select distinct TABLE_NAME "
 				+ "from all_constraints " 
 				+ "where r_constraint_name in ("
 				+ "		select constraint_name " 
