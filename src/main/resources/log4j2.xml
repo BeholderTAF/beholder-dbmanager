@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <configuration status="OFF">
+   <appenders>
+     <Console name="Console" target="SYSTEM_OUT">
+       <PatternLayout pattern="%-5level %msg%n"/>
+     </Console>
+   </appenders>
+   <loggers>
+     <logger name="br.ufmg.dcc.saotome.beholder.dbmanager.OracleDatabaseManager" level="INFO" additivity="false">
+        <appender-ref ref="Console"/>
+     </logger>
+   </loggers>
+ </configuration>
