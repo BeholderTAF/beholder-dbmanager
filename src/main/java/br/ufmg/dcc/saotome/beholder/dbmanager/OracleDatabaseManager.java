@@ -46,8 +46,10 @@ public class OracleDatabaseManager {
 	 *
 	 */
 	private enum ExtensionFile {
-		XML(".xml"),
-		ORD(".ord");
+		XML(".xml")
+		,ORD(".ord")
+		,DTD(".dtd")
+		;
 		
 		private String extension;
 		private ExtensionFile(String extension) {
@@ -183,7 +185,7 @@ public class OracleDatabaseManager {
 					QueryDataSet partialDataSet = new QueryDataSet(connection);
 					partialDataSet.addTable(string);
 					FlatXmlDataSet.write(partialDataSet, new FileOutputStream(filePath(tableName, ExtensionFile.XML)));
-					LOG.info(String.format("Tabela %s exportada.", string));
+					LOG.info(String.format("Dados da Tabela %s exportada.", string));
 				}
 			}
 		} catch (FileNotFoundException e) {
@@ -292,7 +294,9 @@ public class OracleDatabaseManager {
 		try {
 			ArrayList<IDataSet> dataSets = new ArrayList<IDataSet>();
 			try {
-				dataSets.add(new FlatXmlDataSetBuilder().build(new File(filePath(tableName, ExtensionFile.XML))));
+				FlatXmlDataSetBuilder builder = new FlatXmlDataSetBuilder();
+				builder.setColumnSensing(true);
+				dataSets.add(builder.build(new File(filePath(tableName, ExtensionFile.XML))));
 				LOG.info("Carregando o arquivo "+filePath(tableName, ExtensionFile.XML));
 
 				Scanner scan;
@@ -300,7 +304,7 @@ public class OracleDatabaseManager {
 					scan = new Scanner(new File(filePath(tableName, ExtensionFile.ORD)));
 					while (scan.hasNext()) {
 						String depTableName = scan.nextLine();
-						dataSets.add(new FlatXmlDataSetBuilder().build(new File(filePath(depTableName, ExtensionFile.XML))));
+						dataSets.add(builder.build(new File(filePath(depTableName, ExtensionFile.XML))));
 						LOG.info("Carregando o arquivo "+filePath(depTableName, ExtensionFile.XML));
 					}
 					CompositeDataSet compDataSet = new CompositeDataSet(dataSets.toArray(new FlatXmlDataSet[dataSets.size()]));
